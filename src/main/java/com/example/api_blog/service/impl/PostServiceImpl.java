@@ -30,6 +30,16 @@ public class PostServiceImpl implements PostService {
     private final AuthRepo authRepo;
 
     @Override
+    public List<PostResponse> getAllPosts() {
+        return postRepo.getAllPosts();
+    }
+
+    @Override
+    public PostResponse getPostById(long id) {
+        return postRepo.getPostById(id);
+    }
+
+    @Override
     @Transactional
     public PostResponse addPost(PostRequest postRequest, MultipartFile[] files) {
 

@@ -1,6 +1,7 @@
 package com.example.api_blog.repository;
 
 import com.example.api_blog.model.entity.Auth;
+import com.example.api_blog.model.response.UserResponse;
 import com.example.api_blog.model.request.RegisterRequest;
 import org.apache.ibatis.annotations.*;
 import org.springframework.core.convert.ConversionService;
@@ -38,4 +39,7 @@ select * from users where user_id = #{userId}
 """)
     @ResultMap("AuthMapper")
     Auth findByUserId(long userId);
+
+    @Select("select user_id as userId, user_name as userName, email from users where user_id = #{userId}")
+    UserResponse findUserResponseById(long userId);
 }
