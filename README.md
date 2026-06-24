@@ -4,8 +4,8 @@ REST API for a blog backend built with Spring Boot, JWT authentication, PostgreS
 
 ## Tech Stack
 
-- Java 17
-- Spring Boot 3.2.5
+- Java 21
+- Spring Boot 3.4.1
 - Spring Security (JWT)
 - MyBatis
 - PostgreSQL
@@ -36,7 +36,7 @@ REST API for a blog backend built with Spring Boot, JWT authentication, PostgreS
 
 ## Prerequisites
 
-- JDK 17+
+- JDK 21+
 - Maven 3.9+ (or use included Maven wrapper)
 - PostgreSQL running locally (default expected: `localhost:5432`)
 - Pinata account and API keys (for image upload endpoint)
