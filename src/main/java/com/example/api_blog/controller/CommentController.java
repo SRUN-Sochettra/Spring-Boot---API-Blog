@@ -36,4 +36,14 @@ public class CommentController {
                 new ApiResponse<>("Comment deleted successfully", null, 200, LocalDateTime.now())
         );
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<CommentResponse>> updateComment(
+            @PathVariable long id,
+            @Valid @RequestBody CommentRequest commentRequest) {
+        CommentResponse comment = commentService.updateComment(id, commentRequest);
+        return ResponseEntity.ok(
+                new ApiResponse<>("Comment updated successfully", comment, 200, LocalDateTime.now())
+        );
+    }
 }

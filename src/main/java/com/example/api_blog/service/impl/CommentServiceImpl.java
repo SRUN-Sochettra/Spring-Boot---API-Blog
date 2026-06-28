@@ -76,4 +76,34 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepo.deleteComment(commentId);
     }
+
+    @Override
+    @Transactional
+    public CommentResponse updateComment(long commentId, CommentRequest commentRequest) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Auth auth = authRepo.findByEmail(email);
+
+        if (auth == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        Comment comment = commentRepo.getCommentById(commentId);
+        if (comment == null) {
+            throw new RuntimeException("Comment not found");
+        }
+
+        if (comment.getUserId() != auth.getUserId()) {
+            throw new RuntimeException("You are not authorized to update this comment");
+        }
+
+        comment.setContent(commentRequest.getContent());
+        commentRepo.updateComment(comment);
+
+        return CommentResponse.builder()
+                .commentId(comment.getCommentId())
+                .content(comment.getContent())
+                .user(new UserResponse(auth.getUserId(), auth.getUserName(), auth.getEmail()))
+                .createdAt(comment.getCreatedAt())
+                .build();
+    }
 }
