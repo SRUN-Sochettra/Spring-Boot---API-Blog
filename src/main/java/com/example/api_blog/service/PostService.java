@@ -10,4 +10,7 @@ public interface PostService {
 
     List<PostResponse> getAllPosts();
     PostResponse getPostById(long id);
+    List<PostResponse> getMyPosts();
+    void deletePost(long id);
+    PostResponse updatePost(long id, PostRequest postRequest, MultipartFile[] files);
 }

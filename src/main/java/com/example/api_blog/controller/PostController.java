@@ -53,4 +53,32 @@ public class PostController {
                 new ApiResponse<>("Post added successfully", post, 200, LocalDateTime.now())
         );
     }
+
+    @GetMapping("/my-posts")
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getMyPosts() {
+        List<PostResponse> posts = postService.getMyPosts();
+        return ResponseEntity.ok(
+                new ApiResponse<>("Posts retrieved successfully", posts, 200, LocalDateTime.now())
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable long id) {
+        postService.deletePost(id);
+        return ResponseEntity.ok(
+                new ApiResponse<>("Post deleted successfully", null, 200, LocalDateTime.now())
+        );
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<PostResponse>> updatePost(
+            @PathVariable long id,
+            @ModelAttribute PostRequest postRequest,
+            @RequestPart(value = "files", required = false) MultipartFile[] files
+    ) {
+        PostResponse post = postService.updatePost(id, postRequest, files);
+        return ResponseEntity.ok(
+                new ApiResponse<>("Post updated successfully", post, 200, LocalDateTime.now())
+        );
+    }
 }
