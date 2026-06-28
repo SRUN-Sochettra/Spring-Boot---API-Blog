@@ -24,3 +24,14 @@ CREATE TABLE IF NOT EXISTS post_image (
     constraint fk_image_post foreign key (post_id)
         references posts(post_id) on update cascade on delete cascade
 );
+CREATE TABLE IF NOT EXISTS comments (
+    comment_id  serial        primary key,
+    content     varchar(500)  not null,
+    post_id     int           not null,
+    user_id     int           not null,
+    created_at  timestamp     not null default current_timestamp,
+    constraint fk_comment_post foreign key (post_id)
+        references posts(post_id) on update cascade on delete cascade,
+    constraint fk_comment_user foreign key (user_id)
+        references users(user_id) on update cascade on delete cascade
+);
