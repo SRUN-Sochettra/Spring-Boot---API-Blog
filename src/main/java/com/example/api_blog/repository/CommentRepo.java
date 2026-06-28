@@ -25,6 +25,9 @@ public interface CommentRepo {
     @Delete("delete from comments where comment_id = #{commentId}")
     void deleteComment(long commentId);
 
+    @Update("update comments set content = #{content} where comment_id = #{commentId}")
+    void updateComment(Comment comment);
+
     @Select("select comment_id, content, post_id, user_id, created_at from comments where comment_id = #{commentId}")
     @Results({
         @Result(property = "commentId", column = "comment_id"),
