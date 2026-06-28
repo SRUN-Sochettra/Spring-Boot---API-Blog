@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +21,27 @@ import java.time.LocalDateTime;
 public class PostController {
 
     private final PostService postService;
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getAllPosts() {
+        List<PostResponse> posts = postService.getAllPosts();
+        return ResponseEntity.ok(
+                new ApiResponse<>("Posts retrieved successfully", posts, 200, LocalDateTime.now())
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<PostResponse>> getPostById(@PathVariable long id) {
+        PostResponse post = postService.getPostById(id);
+        if (post == null) {
+            return ResponseEntity.status(404).body(
+                    new ApiResponse<>("Post not found", null, 404, LocalDateTime.now())
+            );
+        }
+        return ResponseEntity.ok(
+                new ApiResponse<>("Post retrieved successfully", post, 200, LocalDateTime.now())
+        );
+    }
 
     @PostMapping(value = "/add-post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PostResponse>> addPost(

@@ -23,4 +23,8 @@ public interface PostImageRepo {
             @Result(property = "imageUrl",column = "image_url")
     })
     void insertImage(@Param("images") List<PostImage> images);
+
+    @Select("select * from post_image where post_id = #{postId}")
+    @ResultMap("postImageMapper")
+    List<PostImage> findByPostId(long postId);
 }
