@@ -40,6 +40,82 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<PostResponse> getMyPosts() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Auth auth = authRepo.findByEmail(email);
+        if (auth == null) {
+            throw new RuntimeException("User not found");
+        }
+        return postRepo.getPostsByUserId(auth.getUserId());
+    }
+
+    @Override
+    @Transactional
+    public void deletePost(long id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Auth auth = authRepo.findByEmail(email);
+        if (auth == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        PostResponse post = postRepo.getPostById(id);
+        if (post == null) {
+            throw new RuntimeException("Post not found");
+        }
+
+        if (post.getUser().getUserId() != auth.getUserId()) {
+            throw new RuntimeException("You are not authorized to delete this post");
+        }
+
+        postRepo.deletePost(id);
+    }
+
+    @Override
+    @Transactional
+    public PostResponse updatePost(long id, PostRequest postRequest, MultipartFile[] files) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Auth auth = authRepo.findByEmail(email);
+        if (auth == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        PostResponse existingPost = postRepo.getPostById(id);
+        if (existingPost == null) {
+            throw new RuntimeException("Post not found");
+        }
+
+        if (existingPost.getUser().getUserId() != auth.getUserId()) {
+            throw new RuntimeException("You are not authorized to update this post");
+        }
+
+        Post post = new Post();
+        post.setPostId(id);
+        post.setTitle(postRequest.getTitle() != null ? postRequest.getTitle() : existingPost.getTitle());
+        post.setDescription(postRequest.getDescription() != null ? postRequest.getDescription() : existingPost.getDescription());
+
+        postRepo.updatePost(post);
+
+        if (files != null && files.length > 0) {
+            List<PostImage> images = new ArrayList<>();
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String url = pinataService.uploadFile(file);
+                    PostImage postImage = new PostImage();
+                    postImage.setPostId(id);
+                    postImage.setImageUrl(url);
+                    images.add(postImage);
+                }
+            }
+
+            if (!images.isEmpty()) {
+                postImageRepo.insertImage(images);
+            }
+        }
+
+        return postRepo.getPostById(id);
+    }
+
+    @Override
     @Transactional
     public PostResponse addPost(PostRequest postRequest, MultipartFile[] files) {
 
