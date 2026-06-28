@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface PostRepo {
-    // Fix this in PostRepo.java:
     @Insert("insert into posts(title,description,user_id,created_at) values (#{title},#{description},#{userId}, now())")
 
     @Results(id = "PostMapper",value = {
@@ -27,7 +26,9 @@ public interface PostRepo {
             @Result(property = "user", column = "user_id", javaType = com.example.api_blog.model.response.UserResponse.class,
                     one = @One(select = "com.example.api_blog.repository.AuthRepo.findUserResponseById")),
             @Result(property = "images", column = "post_id", javaType = List.class,
-                    many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId"))
+                    many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId")),
+            @Result(property = "comments", column = "post_id", javaType = List.class,
+                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId"))
     })
     List<PostResponse> getAllPosts();
 
@@ -39,7 +40,9 @@ public interface PostRepo {
             @Result(property = "user", column = "user_id", javaType = com.example.api_blog.model.response.UserResponse.class,
                     one = @One(select = "com.example.api_blog.repository.AuthRepo.findUserResponseById")),
             @Result(property = "images", column = "post_id", javaType = List.class,
-                    many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId"))
+                    many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId")),
+            @Result(property = "comments", column = "post_id", javaType = List.class,
+                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId"))
     })
     PostResponse getPostById(long id);
 
@@ -57,7 +60,9 @@ public interface PostRepo {
             @Result(property = "user", column = "user_id", javaType = com.example.api_blog.model.response.UserResponse.class,
                     one = @One(select = "com.example.api_blog.repository.AuthRepo.findUserResponseById")),
             @Result(property = "images", column = "post_id", javaType = List.class,
-                    many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId"))
+                    many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId")),
+            @Result(property = "comments", column = "post_id", javaType = List.class,
+                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId"))
     })
     List<PostResponse> getPostsByUserId(long userId);
 }
