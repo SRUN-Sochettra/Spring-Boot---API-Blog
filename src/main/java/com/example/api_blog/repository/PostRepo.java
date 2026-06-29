@@ -28,7 +28,9 @@ public interface PostRepo {
             @Result(property = "images", column = "post_id", javaType = List.class,
                     many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId")),
             @Result(property = "comments", column = "post_id", javaType = List.class,
-                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId"))
+                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId")),
+            @Result(property = "likeCount", column = "post_id", javaType = Integer.class,
+                    one = @One(select = "com.example.api_blog.repository.PostLikeRepo.getLikeCountForPost"))
     })
     List<PostResponse> getAllPosts();
 
@@ -42,7 +44,9 @@ public interface PostRepo {
             @Result(property = "images", column = "post_id", javaType = List.class,
                     many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId")),
             @Result(property = "comments", column = "post_id", javaType = List.class,
-                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId"))
+                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId")),
+            @Result(property = "likeCount", column = "post_id", javaType = Integer.class,
+                    one = @One(select = "com.example.api_blog.repository.PostLikeRepo.getLikeCountForPost"))
     })
     PostResponse getPostById(long id);
 
@@ -62,7 +66,9 @@ public interface PostRepo {
             @Result(property = "images", column = "post_id", javaType = List.class,
                     many = @Many(select = "com.example.api_blog.repository.PostImageRepo.findByPostId")),
             @Result(property = "comments", column = "post_id", javaType = List.class,
-                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId"))
+                    many = @Many(select = "com.example.api_blog.repository.CommentRepo.findByPostId")),
+            @Result(property = "likeCount", column = "post_id", javaType = Integer.class,
+                    one = @One(select = "com.example.api_blog.repository.PostLikeRepo.getLikeCountForPost"))
     })
     List<PostResponse> getPostsByUserId(long userId);
 }

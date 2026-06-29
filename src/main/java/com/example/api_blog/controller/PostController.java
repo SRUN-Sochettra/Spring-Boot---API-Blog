@@ -81,4 +81,20 @@ public class PostController {
                 new ApiResponse<>("Post updated successfully", post, 200, LocalDateTime.now())
         );
     }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<ApiResponse<Void>> likePost(@PathVariable long id) {
+        postService.likePost(id);
+        return ResponseEntity.ok(
+                new ApiResponse<>("Post liked successfully", null, 200, LocalDateTime.now())
+        );
+    }
+
+    @DeleteMapping("/{id}/like")
+    public ResponseEntity<ApiResponse<Void>> unlikePost(@PathVariable long id) {
+        postService.unlikePost(id);
+        return ResponseEntity.ok(
+                new ApiResponse<>("Post unliked successfully", null, 200, LocalDateTime.now())
+        );
+    }
 }

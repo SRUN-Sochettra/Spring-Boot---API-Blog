@@ -13,4 +13,6 @@ public interface PostService {
     List<PostResponse> getMyPosts();
     void deletePost(long id);
     PostResponse updatePost(long id, PostRequest postRequest, MultipartFile[] files);
+    void likePost(long postId);
+    void unlikePost(long postId);
 }
