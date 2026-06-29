@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.api_blog.exception.ResourceNotFoundException;
+import com.example.api_blog.exception.ForbiddenException;
 
 import java.time.LocalDateTime;
 
@@ -32,12 +34,12 @@ public class CommentServiceImpl implements CommentService {
         Auth auth = authRepo.findByEmail(email);
 
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         PostResponse post = postRepo.getPostById(commentRequest.getPostId());
         if (post == null) {
-            throw new RuntimeException("Post not found");
+            throw new ResourceNotFoundException("Post not found");
         }
 
         Comment comment = new Comment();
@@ -62,16 +64,16 @@ public class CommentServiceImpl implements CommentService {
         Auth auth = authRepo.findByEmail(email);
 
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         Comment comment = commentRepo.getCommentById(commentId);
         if (comment == null) {
-            throw new RuntimeException("Comment not found");
+            throw new ResourceNotFoundException("Comment not found");
         }
 
         if (comment.getUserId() != auth.getUserId()) {
-            throw new RuntimeException("You are not authorized to delete this comment");
+            throw new ForbiddenException("You are not authorized to delete this comment");
         }
 
         commentRepo.deleteComment(commentId);
@@ -84,16 +86,16 @@ public class CommentServiceImpl implements CommentService {
         Auth auth = authRepo.findByEmail(email);
 
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         Comment comment = commentRepo.getCommentById(commentId);
         if (comment == null) {
-            throw new RuntimeException("Comment not found");
+            throw new ResourceNotFoundException("Comment not found");
         }
 
         if (comment.getUserId() != auth.getUserId()) {
-            throw new RuntimeException("You are not authorized to update this comment");
+            throw new ForbiddenException("You are not authorized to update this comment");
         }
 
         comment.setContent(commentRequest.getContent());

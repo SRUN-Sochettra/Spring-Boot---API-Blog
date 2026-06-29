@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.api_blog.exception.ResourceNotFoundException;
+import com.example.api_blog.exception.ForbiddenException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -54,7 +56,7 @@ public class PostServiceImpl implements PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Auth auth = authRepo.findByEmail(email);
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
         List<PostResponse> posts = postRepo.getPostsByUserId(auth.getUserId());
         populateLikedByCurrentUser(posts);
@@ -67,16 +69,16 @@ public class PostServiceImpl implements PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Auth auth = authRepo.findByEmail(email);
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         PostResponse post = postRepo.getPostById(id);
         if (post == null) {
-            throw new RuntimeException("Post not found");
+            throw new ResourceNotFoundException("Post not found");
         }
 
         if (post.getUser().getUserId() != auth.getUserId()) {
-            throw new RuntimeException("You are not authorized to delete this post");
+            throw new ForbiddenException("You are not authorized to delete this post");
         }
 
         postRepo.deletePost(id);
@@ -88,16 +90,16 @@ public class PostServiceImpl implements PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Auth auth = authRepo.findByEmail(email);
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         PostResponse existingPost = postRepo.getPostById(id);
         if (existingPost == null) {
-            throw new RuntimeException("Post not found");
+            throw new ResourceNotFoundException("Post not found");
         }
 
         if (existingPost.getUser().getUserId() != auth.getUserId()) {
-            throw new RuntimeException("You are not authorized to update this post");
+            throw new ForbiddenException("You are not authorized to update this post");
         }
 
         Post post = new Post();
@@ -142,7 +144,7 @@ public class PostServiceImpl implements PostService {
         Auth auth = authRepo.findByEmail(email);
 
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         Post post = new Post();
@@ -208,12 +210,12 @@ public class PostServiceImpl implements PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Auth auth = authRepo.findByEmail(email);
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         PostResponse post = postRepo.getPostById(postId);
         if (post == null) {
-            throw new RuntimeException("Post not found");
+            throw new ResourceNotFoundException("Post not found");
         }
 
         postLikeRepo.likePost(postId, auth.getUserId());
@@ -225,7 +227,7 @@ public class PostServiceImpl implements PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Auth auth = authRepo.findByEmail(email);
         if (auth == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         postLikeRepo.unlikePost(postId, auth.getUserId());
