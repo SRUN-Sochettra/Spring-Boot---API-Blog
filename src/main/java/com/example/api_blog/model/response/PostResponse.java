@@ -19,4 +19,6 @@ public class PostResponse {
     private UserResponse user;
     private List<PostImage> images;
     private List<CommentResponse> comments;
+    private int likeCount;
+    private boolean likedByCurrentUser;
 }

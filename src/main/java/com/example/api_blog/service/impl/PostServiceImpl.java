@@ -8,6 +8,7 @@ import com.example.api_blog.model.response.PostResponse;
 import com.example.api_blog.model.response.UserResponse;
 import com.example.api_blog.repository.AuthRepo;
 import com.example.api_blog.repository.PostImageRepo;
+import com.example.api_blog.repository.PostLikeRepo;
 import com.example.api_blog.repository.PostRepo;
 import com.example.api_blog.service.PinataService;
 import com.example.api_blog.service.PostService;
@@ -28,15 +29,24 @@ public class PostServiceImpl implements PostService {
     private final PinataService pinataService;
     private final PostImageRepo postImageRepo;
     private final AuthRepo authRepo;
+    private final PostLikeRepo postLikeRepo;
 
     @Override
     public List<PostResponse> getAllPosts() {
-        return postRepo.getAllPosts();
+        List<PostResponse> posts = postRepo.getAllPosts();
+        populateLikedByCurrentUser(posts);
+        return posts;
     }
 
     @Override
     public PostResponse getPostById(long id) {
-        return postRepo.getPostById(id);
+        PostResponse responsePost = postRepo.getPostById(id);
+        if (responsePost != null) {
+            List<PostResponse> posts = new ArrayList<>();
+            posts.add(responsePost);
+            populateLikedByCurrentUser(posts);
+        }
+        return responsePost;
     }
 
     @Override
@@ -46,7 +56,9 @@ public class PostServiceImpl implements PostService {
         if (auth == null) {
             throw new RuntimeException("User not found");
         }
-        return postRepo.getPostsByUserId(auth.getUserId());
+        List<PostResponse> posts = postRepo.getPostsByUserId(auth.getUserId());
+        populateLikedByCurrentUser(posts);
+        return posts;
     }
 
     @Override
@@ -112,7 +124,13 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        return postRepo.getPostById(id);
+        PostResponse responsePost = postRepo.getPostById(id);
+        if (responsePost != null) {
+            List<PostResponse> posts = new ArrayList<>();
+            posts.add(responsePost);
+            populateLikedByCurrentUser(posts);
+        }
+        return responsePost;
     }
 
     @Override
@@ -158,5 +176,58 @@ public class PostServiceImpl implements PostService {
                 .user(new UserResponse(auth.getUserId(), auth.getUserName(), auth.getEmail()))
                 .images(images)
                 .build();
+    }
+
+    private void populateLikedByCurrentUser(List<PostResponse> posts) {
+        if (posts == null || posts.isEmpty()) return;
+
+        // Try to get current user ID
+        long userId = -1;
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            if (email != null && !email.equals("anonymousUser")) {
+                Auth auth = authRepo.findByEmail(email);
+                if (auth != null) {
+                    userId = auth.getUserId();
+                }
+            }
+        } catch (Exception e) {
+            // Ignore authentication exceptions for public endpoints
+        }
+
+        if (userId != -1) {
+            for (PostResponse post : posts) {
+                post.setLikedByCurrentUser(postLikeRepo.hasUserLikedPost(post.getPostId(), userId));
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void likePost(long postId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Auth auth = authRepo.findByEmail(email);
+        if (auth == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        PostResponse post = postRepo.getPostById(postId);
+        if (post == null) {
+            throw new RuntimeException("Post not found");
+        }
+
+        postLikeRepo.likePost(postId, auth.getUserId());
+    }
+
+    @Override
+    @Transactional
+    public void unlikePost(long postId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Auth auth = authRepo.findByEmail(email);
+        if (auth == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        postLikeRepo.unlikePost(postId, auth.getUserId());
     }
 }
